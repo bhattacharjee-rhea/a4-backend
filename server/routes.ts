@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Authing, Friending, Posting, Sessioning } from "./app";
+import { Authing, Friending, Grouping, Liking, Permitting, Posting, Sessioning } from "./app";
 import { PostOptions } from "./concepts/posting";
 import { SessionDoc } from "./concepts/sessioning";
 import Responses from "./responses";
@@ -151,6 +151,113 @@ class Routes {
     const user = Sessioning.getUser(session);
     const fromOid = (await Authing.getUserByUsername(from))._id;
     return await Friending.rejectRequest(fromOid, user);
+  }
+
+  //like a post
+  @Router.put("/likes/:postId")
+  async likePost(session: SessionDoc, postId: string) {
+    const user = Sessioning.getUser(session);
+    const oid = new ObjectId(postId);
+    return await Liking.like(user, oid);
+  }
+
+  //unlike a post
+  @Router.delete("/likes/:postId")
+  async unlikePost(session: SessionDoc, postId: string) {
+    const user = Sessioning.getUser(session);
+    const oid = new ObjectId(postId);
+    return await Liking.unlike(user, oid);
+  }
+
+  //get post likes
+  @Router.get("/likes/:postId")
+  async getPostLikes(session: SessionDoc, postId: string) {
+    const user = Sessioning.getUser(session);
+    const oid = new ObjectId(postId);
+    await Posting.assertAuthorIsUser(oid, user);
+    return await Liking.getLikesForPost(oid);
+  }
+
+  //is a post liked by user
+  @Router.get("/likes/user/:postId")
+  async isPostLikedByUser(session: SessionDoc, postId: string) {
+    const user = Sessioning.getUser(session);
+    const oid = new ObjectId(postId);
+    return await Liking.isLikedByUser(user, oid);
+  }
+
+  // create a group
+  @Router.post("/groups/:name")
+  async createGroup(session: SessionDoc, name: string) {
+    const user = Sessioning.getUser(session);
+    return await Grouping.create(name, user);
+  }
+
+  // delete a group
+  @Router.delete("/groups/:groupId")
+  async deleteGroup(session: SessionDoc, groupId: string) {
+    const user = Sessioning.getUser(session);
+    const oid = new ObjectId(groupId);
+    await Grouping.assertAuthorIsCreator(oid, user);
+    return await Grouping.delete(oid);
+  }
+
+  // add to group
+  @Router.put("/groups/:groupId/:userId")
+  async addFriendToGroup(session: SessionDoc, groupId: string, userId: string) {
+    const user = Sessioning.getUser(session);
+    const user_oid = new ObjectId(userId);
+    const group_oid = new ObjectId(groupId);
+    await Friending.assertFriendshipExists(user, user_oid);
+    return await Grouping.addToGroup(group_oid, user_oid);
+  }
+
+  // remove from group
+  @Router.delete("/groups/:groupId/:userId")
+  async removeFriendFromGroup(session: SessionDoc, groupId: string, userId: string) {
+    const user = Sessioning.getUser(session);
+    const user_oid = new ObjectId(userId);
+    const group_oid = new ObjectId(groupId);
+    await Friending.assertFriendshipExists(user, user_oid);
+    return await Grouping.removeFromGroup(group_oid, user_oid);
+  }
+
+  // get user's groups
+  @Router.get("/groups")
+  async getGroups(session: SessionDoc) {
+    const user = Sessioning.getUser(session);
+    return await Grouping.getGroupsByCreator(user);
+  }
+
+  // get group
+  @Router.get("/groups/:groupId")
+  async getGroupById(session: SessionDoc, groupId: string) {
+    const user = Sessioning.getUser(session);
+    const oid = new ObjectId(groupId);
+    Grouping.assertAuthorIsCreator(oid, user);
+    return await Grouping.getGroup(oid);
+  }
+
+  // get permissions for a post
+  @Router.get("/permissions/:postId")
+  async getPostPermissions(session: SessionDoc, postId: string) {
+    const user = Sessioning.getUser(session);
+    const oid = new ObjectId(postId);
+    Posting.assertAuthorIsUser(oid, user);
+
+    return await Permitting.getPostPermissions(oid);
+  }
+
+  // get viewable posts
+  @Router.get("/permissions/viewable")
+  async getViewablePosts(session: SessionDoc) {
+    return;
+  }
+
+  // get likeable posts
+  @Router.get("/permissions/likable")
+  async getLikeablePosts(session: SessionDoc) {
+    return;
   }
 }
 

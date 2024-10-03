@@ -80,6 +80,84 @@ const operations: Operation[] = [
     method: "DELETE",
     fields: { id: "input" },
   },
+  {
+    name: "Get Friends",
+    endpoint: "/api/friends/",
+    method: "GET",
+    fields: {},
+  },
+  {
+    name: "Send Friend Request",
+    endpoint: "/api/friend/requests/:to",
+    method: "POST",
+    fields: { to: "input" },
+  },
+  {
+    name: "Accept Friend Request",
+    endpoint: "/api/friend/accept/:from",
+    method: "PUT",
+    fields: { from: "input" },
+  },
+  {
+    name: "Like Post",
+    endpoint: "/api/likes/:id",
+    method: "PUT",
+    fields: { id: "input" },
+  },
+  {
+    name: "Unlike Post",
+    endpoint: "/api/likes/:id",
+    method: "DELETE",
+    fields: { id: "input" },
+  },
+  {
+    name: "Get Post Likes",
+    endpoint: "/api/likes/:id",
+    method: "GET",
+    fields: { id: "input" },
+  },
+  {
+    name: "Is Post Liked",
+    endpoint: "/api/likes/user/:id",
+    method: "GET",
+    fields: { id: "input" },
+  },
+  {
+    name: "Create group",
+    endpoint: "/api/groups/:name",
+    method: "POST",
+    fields: { name: "input" },
+  },
+  {
+    name: "Delete group",
+    endpoint: "/api/groups/:id",
+    method: "DELETE",
+    fields: { id: "input" },
+  },
+  {
+    name: "Add friend to group",
+    endpoint: "/api/groups/:groupId/:userId",
+    method: "PUT",
+    fields: { groupId: "input", userId: "input" },
+  },
+  {
+    name: "Remove friend from group",
+    endpoint: "/api/groups/:groupId/:userId",
+    method: "DELETE",
+    fields: { groupId: "input", userId: "input" },
+  },
+  {
+    name: "Get groups for user",
+    endpoint: "/api/groups/",
+    method: "GET",
+    fields: {},
+  },
+  {
+    name: "Get group by ID",
+    endpoint: "/api/groups/:id",
+    method: "GET",
+    fields: { id: "input" },
+  },
   //
   // ...
   //
