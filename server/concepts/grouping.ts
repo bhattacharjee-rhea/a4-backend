@@ -58,7 +58,7 @@ export default class GroupingConcept {
     }
 
     // remove account from group
-    const index = groupDoc.includes.map((account) => account.toString()).indexOf(account.toString());
+    const index = groupDoc.includes.map((member) => member.toString()).indexOf(account.toString());
     if (index === -1) {
       throw new NotAllowedError("Account not in group!");
     }
@@ -73,8 +73,17 @@ export default class GroupingConcept {
     return await this.groups.readMany({ creator });
   }
 
+  async getGroupsByMember(account: ObjectId) {
+    return (await this.groups.readMany({})).filter((group) => group.includes.map((member) => member.toString()).includes(account.toString()));
+  }
+
   async getGroup(_id: ObjectId) {
-    return await this.groups.readOne({ _id });
+    const group = await this.groups.readOne({ _id });
+    if (!group) {
+      throw new NotFoundError("Group does not exist!");
+    }
+
+    return group;
   }
 
   async assertAuthorIsCreator(groupId: ObjectId, creator: ObjectId) {

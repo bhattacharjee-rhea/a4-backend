@@ -1,13 +1,11 @@
 import { ObjectId } from "mongodb";
 
 import DocCollection, { BaseDoc } from "../framework/doc";
-import { NotAllowedError, NotFoundError } from "./errors";
+import { NotAllowedError } from "./errors";
 
 export interface PermissionDoc extends BaseDoc {
-  group: ObjectId;
-  post: ObjectId;
-  view: boolean;
-  like: boolean;
+  target: ObjectId;
+  resource: ObjectId;
 }
 
 /**
@@ -23,47 +21,32 @@ export default class PermittingConcept {
     this.permissions = new DocCollection<PermissionDoc>(collectionName);
   }
 
-  async create(group: ObjectId, post: ObjectId, view: boolean, like: boolean) {
-    const _id = await this.permissions.createOne({ group, post, view, like });
+  async create(target: ObjectId, resource: ObjectId) {
+    const _id = await this.permissions.createOne({ target, resource });
     return { msg: "Permission successfully created!", permission: await this.permissions.readOne({ _id }) };
   }
 
-  async remove(permission: ObjectId) {
-    await this.permissions.deleteOne({ _id: permission });
+  async delete(target: ObjectId, resource: ObjectId) {
+    await this.permissions.deleteOne({ target, resource });
     return { msg: "Permission deleted successfully!" };
   }
 
-  async canView(group: ObjectId, post: ObjectId) {
-    const permission = await this.permissions.readOne({ group, post });
-    if (permission === null) {
-      throw new NotFoundError("Permission not found!");
-    }
-    return permission.view;
+  async permissionExistsForAny(targets: ObjectId[], resource: ObjectId) {
+    const granted_permissions = await this.permissions.readMany({ resource });
+    const permitted_targets = granted_permissions.map((permission) => permission.target.toString());
+    const overlap = permitted_targets.filter((target) => targets.map((t) => t.toString()).includes(target));
+
+    return overlap.length > 0;
   }
 
-  async assertCanView(group: ObjectId, post: ObjectId) {
-    const view = await this.canView(group, post);
-    if (!view) {
-      throw new NotAllowedError("You do not have permission to view this post!");
-    }
-  }
-
-  async canLike(group: ObjectId, post: ObjectId) {
-    const permission = await this.permissions.readOne({ group, post });
-    if (permission === null) {
-      throw new NotFoundError("Permission not found!");
-    }
-    return permission.like;
-  }
-
-  async assertCanLike(group: ObjectId, post: ObjectId) {
-    const like = await this.canLike(group, post);
-    if (!like) {
-      throw new NotAllowedError("You do not have permission to like this post!");
+  async assertPermissionExistsForAny(targets: ObjectId[], resource: ObjectId) {
+    const permission = this.permissionExistsForAny(targets, resource);
+    if (!permission) {
+      throw new NotAllowedError("You do not have permission to do this!");
     }
   }
 
-  async getPostPermissions(post: ObjectId) {
-    return await this.permissions.readMany({ post });
+  async getPermissionsForResource(resource: ObjectId) {
+    return await this.permissions.readMany({ resource });
   }
 }

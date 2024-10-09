@@ -4,8 +4,8 @@ import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotAllowedError } from "./errors";
 
 export interface LikeDoc extends BaseDoc {
-  user: ObjectId;
-  post: ObjectId;
+  likedBy: ObjectId;
+  item: ObjectId;
 }
 
 /**
@@ -21,31 +21,31 @@ export default class LikingConcept {
     this.likes = new DocCollection<LikeDoc>(collectionName);
   }
 
-  async like(user: ObjectId, post: ObjectId) {
-    const like = await this.likes.readOne({ user, post });
+  async like(likedBy: ObjectId, item: ObjectId) {
+    const like = await this.likes.readOne({ likedBy, item });
     if (like !== null) {
-      throw new NotAllowedError("Post is already liked!");
+      throw new NotAllowedError("Item is already liked!");
     }
 
-    const _id = await this.likes.createOne({ user, post });
-    return { msg: "Post successfully liked!", post: await this.likes.readOne({ _id }) };
+    const _id = await this.likes.createOne({ likedBy, item });
+    return { msg: "Item successfully liked!", like: await this.likes.readOne({ _id }) };
   }
 
-  async unlike(user: ObjectId, post: ObjectId) {
-    const like = await this.likes.popOne({ user, post });
+  async unlike(likedBy: ObjectId, item: ObjectId) {
+    const like = await this.likes.popOne({ likedBy, item });
     if (like === null) {
-      throw new NotAllowedError("Post is not liked!");
+      throw new NotAllowedError("Item is not liked!");
     }
 
     return { msg: "Unliked!" };
   }
 
-  async isLikedByUser(user: ObjectId, post: ObjectId) {
-    const like = await this.likes.readOne({ user, post });
+  async isLikedByUser(user: ObjectId, item: ObjectId) {
+    const like = await this.likes.readOne({ user, item });
     return like !== null;
   }
 
-  async getLikesForPost(post: ObjectId) {
-    return await this.likes.readMany({ post });
+  async getLikesForItem(item: ObjectId) {
+    return await this.likes.readMany({ item });
   }
 }
