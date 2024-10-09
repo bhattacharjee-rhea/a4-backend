@@ -14,4 +14,5 @@ export const Posting = new PostingConcept("posts");
 export const Friending = new FriendingConcept("friends");
 export const Liking = new LikingConcept("likes");
 export const Grouping = new GroupingConcept("groups");
-export const Permitting = new PermittingConcept("permissions");
+export const ViewPermitting = new PermittingConcept("view permissions");
+export const LikePermitting = new PermittingConcept("like permissions");

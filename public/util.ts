@@ -147,8 +147,14 @@ const operations: Operation[] = [
     fields: { groupId: "input", userId: "input" },
   },
   {
-    name: "Get groups for user",
-    endpoint: "/api/groups/",
+    name: "Get groups user is a member of",
+    endpoint: "/api/groups/member",
+    method: "GET",
+    fields: {},
+  },
+  {
+    name: "Get groups user created",
+    endpoint: "/api/groups/creator",
     method: "GET",
     fields: {},
   },
@@ -157,6 +163,54 @@ const operations: Operation[] = [
     endpoint: "/api/groups/:id",
     method: "GET",
     fields: { id: "input" },
+  },
+  {
+    name: "Get permission for own post",
+    endpoint: "/api/permissions/:id",
+    method: "GET",
+    fields: { id: "input" },
+  },
+  {
+    name: "Get permissions for another user's post",
+    endpoint: "/api/permissions/post/:id",
+    method: "GET",
+    fields: { id: "input" },
+  },
+  {
+    name: "Get viewable posts",
+    endpoint: "/api/permission/view",
+    method: "GET",
+    fields: {},
+  },
+  {
+    name: "Get likeable posts",
+    endpoint: "/api/permission/like",
+    method: "GET",
+    fields: {},
+  },
+  {
+    name: "Add view permission to post",
+    endpoint: "/api/permission/view",
+    method: "POST",
+    fields: { postId: "input", groupId: "input" },
+  },
+  {
+    name: "Add like permission to post",
+    endpoint: "/api/permission/like",
+    method: "POST",
+    fields: { postId: "input", groupId: "input" },
+  },
+  {
+    name: "Remove view permission from post",
+    endpoint: "/api/permission/view",
+    method: "DELETE",
+    fields: { postId: "input", groupId: "input" },
+  },
+  {
+    name: "Remove like permission from post",
+    endpoint: "/api/permission/like",
+    method: "DELETE",
+    fields: { postId: "input", groupId: "input" },
   },
   //
   // ...
