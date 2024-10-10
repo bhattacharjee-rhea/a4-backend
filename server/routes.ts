@@ -263,7 +263,7 @@ class Routes {
     return { views: viewPermissions, likes: likePermissions };
   }
 
-  // see own permissions for another user's post
+  // see your permissions for another user's post
   @Router.get("/permissions/post/:postId")
   async seePostPermissions(session: SessionDoc, postId: string) {
     const user = Sessioning.getUser(session);
@@ -350,9 +350,6 @@ class Routes {
 
     return { msg: "Sucessfully removed permission!" };
   }
-
-  // postid = 66fdb3e4b14700ee81946f47
-  // groupid = 66fdf7fe785e3f49bfc5adbb
 }
 
 /** The web app. */

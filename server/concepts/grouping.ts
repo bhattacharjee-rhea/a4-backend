@@ -41,7 +41,7 @@ export default class GroupingConcept {
 
     groupDoc.includes = groupDoc.includes ?? [];
 
-    if (groupDoc.includes.includes(account)) {
+    if (groupDoc.includes.map((a) => a.toString()).includes(account.toString())) {
       throw new NotAllowedError("Account already in group!");
     }
 
